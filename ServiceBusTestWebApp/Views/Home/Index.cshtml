@@ -1,0 +1,39 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<div class="jumbotron">
+    <h1>Azure Service Bus</h1>
+    <p class="lead">How to use service bus queue in ASP.NET.</p>
+    <p><a href="https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-dotnet-get-started-with-queues" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+</div>
+@using (Html.BeginForm("Index", "Home", FormMethod.Post))
+{
+    <table>
+        <tr>
+            <td colspan="5">
+                <h6>@ViewBag.Msg</h6>
+            </td>
+        </tr>
+        <tr>
+            <td>Enter message for service bus queue:</td>
+            <td>
+                @Html.TextBox("txtSend")
+                @*<input id="txtSend" type="text" />*@
+            </td>
+            <td>
+                <input id="btnSend" type="submit" name="Send" value="Send Message" />
+            </td>
+        </tr>
+        <tr>
+            <td>Get message from service bus queue:</td>
+            <td>
+                @Html.TextBox("txtGet", (string)ViewBag.Qmsg2)
+                @*@Html.TextBox("txtGet2", (string)ViewBag.Qmsg)*@
+            </td>
+            <td>
+                <input id="btnGet" type="submit" name="Send" value="Get Message" />
+            </td>
+        </tr>
+    </table>
+}
