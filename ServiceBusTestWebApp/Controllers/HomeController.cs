@@ -76,9 +76,12 @@ namespace ServiceBusTestWebApp.Controllers
                         var t = message.MessageId;
                         msg3 = message.GetBody<string>();
                         message.Complete();
+                        break;
                     }
                     else
                     {
+                       
+                        ViewBag.Msg = "No active message is avilable in service bus queue.";
                         //no more messages in the queue 
                         break;
                     }
