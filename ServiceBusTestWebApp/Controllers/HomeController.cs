@@ -16,6 +16,7 @@ namespace ServiceBusTestWebApp.Controllers
             return View();
         }
         [HttpPost]
+        [ActionName("Index")]
         public ActionResult Index(FormCollection form, string Send)
         {
             if (Send == "Send Message")
@@ -23,6 +24,33 @@ namespace ServiceBusTestWebApp.Controllers
                 var sendMsg = form["txtSend"].ToString();
                 var connectionString = "Endpoint=sb://skpqueuetest.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=VhayAssHzW/WDMZuzTnGBXpTyD0qbm+Fibnwjsoar/0=";
                 var queueName = "qtest1";
+
+                var client = QueueClient.CreateFromConnectionString(connectionString, queueName);
+                var message = new BrokeredMessage(sendMsg);
+                client.Send(message);
+                ViewBag.Msg = "Data Sent Suuceessfully.";
+            }
+            else
+            {
+                //getQueueValue1();
+                getQueueValue2();
+            }
+            return View();
+        }
+        [HttpGet]
+        public ActionResult Index2()
+        {
+            return View();
+        }
+        [HttpPost]
+        [ActionName("Index2")]
+        public ActionResult Index2(FormCollection form, string Send)
+        {
+            if (Send == "Send Message")
+            {
+                var sendMsg = form["txtSend"].ToString();
+                var connectionString = form["txtEndpoint"].ToString(); //"Endpoint=sb://skpqueuetest.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=VhayAssHzW/WDMZuzTnGBXpTyD0qbm+Fibnwjsoar/0=";
+                var queueName = form["txtQueueName"].ToString(); //"qtest1";
 
                 var client = QueueClient.CreateFromConnectionString(connectionString, queueName);
                 var message = new BrokeredMessage(sendMsg);
