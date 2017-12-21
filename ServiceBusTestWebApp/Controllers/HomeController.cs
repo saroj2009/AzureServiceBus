@@ -20,7 +20,14 @@ namespace ServiceBusTestWebApp.Controllers
         public ActionResult Index(FormCollection form, string Send)
         {
             var connectionString = form["txtEndpoint"].ToString();
-            var queueName = form["txtQueueName"].ToString(); 
+            var queueName = form["txtQueueName"].ToString();
+
+            var namespaceManager = NamespaceManager.CreateFromConnectionString(connectionString);
+            if (!namespaceManager.QueueExists(queueName))
+            {
+                namespaceManager.CreateQueue(queueName);
+            }
+
             TempData["connectionString"] = connectionString;
             TempData["queueName"] = queueName;
             ViewBag.Msg = "Service Bus Endpoint has been saved suceessfully.";
