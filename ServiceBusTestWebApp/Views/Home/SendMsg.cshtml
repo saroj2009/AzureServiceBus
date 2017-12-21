@@ -1,15 +1,16 @@
-﻿@{
+﻿
+@{
     ViewBag.Title = "Home Page";
 }
 
 <div class="jumbotron">
-    <h2>Azure Service Bus Endpoint and Queue Name</h2>
+    <h2>Send Message To Service Bus Queue</h2>
 
-    @using (Html.BeginForm("Index", "Home", FormMethod.Post))
+    @using (Html.BeginForm("SendMsg", "Home", FormMethod.Post))
     {
         <table>
             <tr>
-                <td colspan="2" align="center">
+                <td colspan="5" align="center">
                     <h6>@ViewBag.Msg</h6>
                 </td>
             </tr>
@@ -18,22 +19,25 @@
                 <td>
                     @Html.TextBox("txtEndpoint", (string)ViewBag.Endpoint)
                 </td>
-
             </tr>
-            <tr><td colspan="2"><h6>EX: "Endpoint=sb://skpqueuetest.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;<br />SharedAccessKey=VhayAssHzW/WDMZuzTnGBXpTyD0qbm+Fibnwjsoar/0="</h6></td></tr>
             <tr>
                 <td>Enter Servicebus Queue Name:</td>
                 <td>
-                    @Html.TextBox("txtQueueName", (string)ViewBag.QueueName)
+                    @Html.Label("txtQueueName", (string)ViewBag.QueueName)
                 </td>
-
+            </tr>
+            <tr>
+                <td>Enter message for service bus queue:</td>
+                <td>
+                    @Html.TextBox("txtSend")
+                </td>
+                <td>(@ViewBag.MsgCount)</td>
             </tr>
             <tr>
                 <td colspan="2" align="right">
-                    <input id="btnSend" type="submit" name="Send" value="Submit" />
+                    <input id="btnSend" type="submit" name="Send" value="Send Message" />
                 </td>
             </tr>
-
         </table>
     }
 

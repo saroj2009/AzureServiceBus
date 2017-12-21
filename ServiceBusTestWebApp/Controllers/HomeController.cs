@@ -19,36 +19,126 @@ namespace ServiceBusTestWebApp.Controllers
         [ActionName("Index")]
         public ActionResult Index(FormCollection form, string Send)
         {
-            if (Send == "Send Message")
+            var connectionString = form["txtEndpoint"].ToString();
+            var queueName = form["txtQueueName"].ToString(); 
+            TempData["connectionString"] = connectionString;
+            TempData["queueName"] = queueName;
+            ViewBag.Msg = "Service Bus Endpoint has been saved suceessfully.";
+            //return View();
+            return RedirectToAction("SendMsg");
+        }
+        public ActionResult SendMsg()
+        {
+            string connectionString = "";
+            string queueName = "";
+            if (TempData["connectionString"] != null)
             {
-                var sendMsg = form["txtSend"].ToString();
-                var connectionString = "Endpoint=sb://skpqueuetest.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=VhayAssHzW/WDMZuzTnGBXpTyD0qbm+Fibnwjsoar/0=";
-                var queueName = "qtest1";
-                ViewBag.Endpoint = connectionString;
-                ViewBag.QueueName = queueName;
-
-                var client = QueueClient.CreateFromConnectionString(connectionString, queueName);
-                var message = new BrokeredMessage(sendMsg);
-                client.Send(message);
-                ViewBag.Msg = "Message has been sent suceessfully.";
+                connectionString = Convert.ToString(TempData["connectionString"]);
+                TempData.Keep("connectionString");
             }
-            else
+            if (TempData["queueName"] != null)
             {
-                getQueueValue();
+                queueName = Convert.ToString(TempData["queueName"]);
+                TempData.Keep("queueName");
             }
+            if (TempData["connectionString"] == null || TempData["queueName"] == null)
+            {
+                ViewBag.Msg = "Please enter valid Service Bus Endpoint.";
+                return View("Index");
+            }
+            getTotalMsg(connectionString, queueName);
+            ViewBag.Endpoint = connectionString;
+            ViewBag.QueueName = queueName;
+            return View();
+        }
+        [HttpPost]
+        [ActionName("SendMsg")]
+        public ActionResult SendMsg(FormCollection form)
+        {
+            var sendMsg = form["txtSend"].ToString();
+            string connectionString = "";
+            string queueName = "";
+            if (TempData["connectionString"] != null)
+            {
+                connectionString = Convert.ToString(TempData["connectionString"]);
+                TempData.Keep("connectionString");
+            }
+            if (TempData["queueName"] != null)
+            {
+                queueName = Convert.ToString(TempData["queueName"]);
+                TempData.Keep("queueName");
+            }
+            ViewBag.Endpoint = connectionString;
+            ViewBag.QueueName = queueName;
+            SetQueueValue(connectionString, queueName, sendMsg);
+            getTotalMsg(connectionString, queueName);
             return View();
         }
         [HttpGet]
-        public ActionResult Index2()
+        public ActionResult GetMsg()
         {
+            string connectionString = "";
+            string queueName = "";
+            if (TempData["connectionString"] != null)
+            {
+                connectionString = Convert.ToString(TempData["connectionString"]);
+                TempData.Keep("connectionString");
+            }
+            if (TempData["queueName"] != null)
+            {
+                queueName = Convert.ToString(TempData["queueName"]);
+                TempData.Keep("queueName");
+            }
+            if (TempData["connectionString"] == null || TempData["queueName"] == null)
+            {
+                ViewBag.Msg = "Please enter valid Service Bus Endpoint.";
+                return View("Index");
+            }
+            getTotalMsg(connectionString, queueName);
+            ViewBag.Endpoint = connectionString;
+            ViewBag.QueueName = queueName;
+            getQueueValue(connectionString, queueName);
             return View();
         }
-       
-        [NonAction]
-        public void getQueueValue()
+        [HttpPost]
+        [ActionName("GetMsg")]
+        public ActionResult GetMsg(FormCollection form)
         {
-            var connectionString = "Endpoint=sb://skpqueuetest.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=VhayAssHzW/WDMZuzTnGBXpTyD0qbm+Fibnwjsoar/0=";
-            var queueName = "qtest1";
+            string connectionString = "";
+            string queueName = "";
+            if (TempData["connectionString"] != null)
+            {
+                connectionString = Convert.ToString(TempData["connectionString"]);
+                TempData.Keep("connectionString");
+            }
+            if (TempData["queueName"] != null)
+            {
+                queueName = Convert.ToString(TempData["queueName"]);
+                TempData.Keep("queueName");
+            }
+            getTotalMsg(connectionString, queueName);
+            ViewBag.Endpoint = connectionString;
+            ViewBag.QueueName = queueName;
+            getQueueValue(connectionString, queueName);
+            return View();
+        }
+        [NonAction]
+        public void SetQueueValue(string strEndpoint, string strQueueName,string strValue)
+        {
+            var sendMsg = strValue;
+            ViewBag.Endpoint = strEndpoint;
+            ViewBag.QueueName = strQueueName;
+
+            var client = QueueClient.CreateFromConnectionString(strEndpoint, strQueueName);
+            var message = new BrokeredMessage(sendMsg);
+            client.Send(message);
+            ViewBag.Msg = "Message has been sent suceessfully.";
+        }
+        [NonAction]
+        public void getQueueValue(string strEndpoint, string strQueueName)
+        {
+            var connectionString = strEndpoint;
+            var queueName = strQueueName;
             ViewBag.Endpoint = connectionString;
             ViewBag.QueueName = queueName;
 
@@ -66,7 +156,6 @@ namespace ServiceBusTestWebApp.Controllers
                     if (message != null)
                     {
                         //Console.WriteLine(string.Format("Message received: Id = {0}, Body = {1}", message.MessageId, message.GetBody<string>()));
-                        // Further custom message processing could go here... 
                         var t = message.MessageId;
                         msg3 = message.GetBody<string>();
                         message.Complete();
@@ -74,9 +163,8 @@ namespace ServiceBusTestWebApp.Controllers
                     }
                     else
                     {
-                       
+                        msg3 = "";
                         ViewBag.Msg = "No active message is avilable in service bus queue.";
-                        //no more messages in the queue 
                         break;
                     }
                 }
@@ -97,19 +185,14 @@ namespace ServiceBusTestWebApp.Controllers
             ViewBag.Qmsg2 = msg3;
             
         }
-
-        public ActionResult About()
+        [NonAction]
+        public void getTotalMsg(string connectionString,string queueName)
         {
-            ViewBag.Message = "Your application description page.";
-
-            return View();
+            var nsmgr = Microsoft.ServiceBus.NamespaceManager.CreateFromConnectionString(connectionString);
+            long count = nsmgr.GetQueue(queueName).MessageCount;
+            ViewBag.MsgCount = count;
         }
 
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
 
-            return View();
-        }
     }
 }
